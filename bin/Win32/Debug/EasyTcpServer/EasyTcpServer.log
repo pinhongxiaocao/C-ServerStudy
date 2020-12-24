@@ -1,5 +1,5 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(437,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
 C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(438,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
   server.cpp
-D:\VS项目\C++\C++服务端学习\C-ServerStudy\EasyTcpServer\server.cpp(133): warning C4715: “processor”: 不是所有的控件路径都返回值
+D:\VS项目\C++\C++服务端学习\C-ServerStudy\EasyTcpServer\EasyTcpServer.hpp(220): warning C4715: “EasyTcpServer::ReceiveData”: 不是所有的控件路径都返回值
   EasyTcpServer.vcxproj -> D:\VS项目\C++\C++服务端学习\C-ServerStudy\HelloSocket\../bin/Win32/Debug\EasyTcpServer.exe

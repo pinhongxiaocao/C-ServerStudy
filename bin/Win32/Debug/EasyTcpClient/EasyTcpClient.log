@@ -1,13 +1,12 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(437,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
 C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(438,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
   client.cpp
-D:\VS项目\C++\C++服务端学习\C-ServerStudy\EasyTcpClient\client.cpp(137,1): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\string.h(133): message : 参见“strcpy”的声明
-D:\VS项目\C++\C++服务端学习\C-ServerStudy\EasyTcpClient\client.cpp(138,1): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\string.h(133): message : 参见“strcpy”的声明
-D:\VS项目\C++\C++服务端学习\C-ServerStudy\EasyTcpClient\client.cpp(149,1): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\string.h(133): message : 参见“strcpy”的声明
-D:\VS项目\C++\C++服务端学习\C-ServerStudy\EasyTcpClient\client.cpp(189,1): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+D:\VS项目\C++\C++服务端学习\C-ServerStudy\EasyTcpClient\EasyTcpClient.hpp(69,1): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\WinSock2.h(1831): message : 参见“inet_addr”的声明
-D:\VS项目\C++\C++服务端学习\C-ServerStudy\EasyTcpClient\client.cpp(118): warning C4715: “processor”: 不是所有的控件路径都返回值
+D:\VS项目\C++\C++服务端学习\C-ServerStudy\EasyTcpClient\client.cpp(33,1): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\string.h(133): message : 参见“strcpy”的声明
+D:\VS项目\C++\C++服务端学习\C-ServerStudy\EasyTcpClient\client.cpp(34,1): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\string.h(133): message : 参见“strcpy”的声明
+D:\VS项目\C++\C++服务端学习\C-ServerStudy\EasyTcpClient\client.cpp(41,1): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\string.h(133): message : 参见“strcpy”的声明
   EasyTcpClient.vcxproj -> D:\VS项目\C++\C++服务端学习\C-ServerStudy\HelloSocket\../bin/Win32/Debug\EasyTcpClient.exe
