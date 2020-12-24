@@ -7,6 +7,8 @@
 #include<WinSock2.h>
 #include<iostream>
 #include<stdio.h>
+#include<vector>
+
 
 using namespace std;
 //建议通过在项目里动态加入 因为在其他模式下不支持这种写法
@@ -19,6 +21,7 @@ enum CMD
 	CMD_LOGIN_RESULT,
 	CMD_LOGINOUT,
 	CMD_LOGINOUT_RESULT,
+	CMD_NEW_USER_JOIN,
 	CMD_ERROR
 };
 
@@ -68,9 +71,66 @@ struct LoginOutResult :public DataHeader
 	}
 	int result;
 };
+struct NewUserJoin :public DataHeader
+{
+	NewUserJoin()
+	{
+		dataLength = sizeof(NewUserJoin);
+		cmd = CMD_NEW_USER_JOIN;
+		scok=0;
+	}
+	int scok;
+};
 #pragma endregion
 
+vector<SOCKET> g_clients;
 
+int processor(SOCKET _cSock)
+{
+	DataHeader header = {};
+	//5 接收客户端数据
+	int nLen = recv(_cSock, (char*)&header, sizeof(DataHeader), 0);
+	if (nLen <= 0)
+	{
+		printf("客户端已经退出,任务结束");
+		return -1;
+	}
+
+	switch (header.cmd)
+	{
+	case CMD_LOGIN:
+	{
+		Login login = {};
+		recv(_cSock, (char*)&login + sizeof(DataHeader), sizeof(Login) - sizeof(DataHeader), 0);
+		cout << "收到了命令 " << login.cmd << "数据长度" << login.dataLength << endl;
+		cout << "账号是" << login.userName << "密码是" << login.passWord << endl;
+		//忽略判断用户密码是否正确的过程
+		//.......
+		LoginResult ret;
+		send(_cSock, (char*)&ret, sizeof(LoginResult), 0);
+	}
+	break;
+	case CMD_LOGINOUT:
+	{
+		LoginOut loginOut = {};
+		recv(_cSock, (char*)&loginOut + sizeof(DataHeader), sizeof(LoginOut) - sizeof(DataHeader), 0);
+		cout << "收到了命令 " << loginOut.cmd << "数据长度" << loginOut.dataLength << endl;
+		cout << "账号是" << loginOut.userName << endl;
+		//忽略判断用户密码是否正确的过程
+		//.......
+		LoginOutResult ret;
+		send(_cSock, (char*)&ret, sizeof(LoginOutResult), 0);
+	}
+	break;
+	default://默认是错误的数据
+	{
+		header.cmd = CMD_ERROR;
+		header.dataLength = 0;
+		send(_cSock, (char*)&header, sizeof(header), 0);
+	}
+	break;
+	}
+}
 
 int main()
 {
@@ -107,63 +167,80 @@ int main()
 	{
 		printf("监听网络端口成功\n");
 	}
-	//4.accept 等待接受客户端连接
-	sockaddr_in clientAddr = {};
-	int nAddrLen = sizeof(sockaddr_in);
-	SOCKET _cSock = INVALID_SOCKET;//初始化是无效的地址
-	_cSock = accept(_sock, (sockaddr*)&clientAddr, &nAddrLen);
-	if (INVALID_SOCKET == _cSock)
-	{
-		printf("错误,接收到了无效客户端SOCKET...\n");
-	}
-	printf("新的客户端加入:IP= %s", inet_ntoa(clientAddr.sin_addr));
+	
 
 
 	while (true)
 	{
-		DataHeader header = {};
-		//5 接收客户端数据
-		int nLen = recv(_cSock, (char*)&header, sizeof(DataHeader), 0);
-		if (nLen <= 0)
+		//伯克利 socket fd_set socket集合
+		fd_set fdRead;
+		fd_set fdWrite;//这个在select方法里目前用不到 方法中可以传空
+		fd_set fdExp;//这个在select方法里目前用不到 方法中可以传空
+
+		//清空fd_set
+		FD_ZERO(&fdRead);
+		FD_ZERO(&fdWrite);
+		FD_ZERO(&fdExp);
+
+		//放置
+		FD_SET(_sock, &fdRead);
+		FD_SET(_sock, &fdWrite);
+		FD_SET(_sock, &fdExp);
+
+		for (int n =(int)g_clients.size()-1; n>=0; n--)
 		{
-			printf("客户端已经退出,任务结束");
+			FD_SET(g_clients[n], &fdRead);
+		}
+
+		//nfds 是一个整数值 是指 set集合中所有描述符(socket)的范围 而不是数量
+		//是所有文件描述符最大值+1 在windows中这个参数可以写0
+		timeval t = { 1,0};
+		int ret= select(_sock + 1, &fdRead, &fdWrite, &fdExp, &t);
+		if(ret<0)
+		{
+			cout << "select,任务结束" << endl;
 			break;
 		}
-		
-		switch (header.cmd)
+		if(FD_ISSET(_sock,&fdRead))
 		{
-		case CMD_LOGIN:
+			FD_CLR(_sock, &fdRead);
+			//4.accept 等待接受客户端连接
+			sockaddr_in clientAddr = {};
+			int nAddrLen = sizeof(sockaddr_in);
+			SOCKET _cSock = INVALID_SOCKET;//初始化是无效的地址
+			_cSock = accept(_sock, (sockaddr*)&clientAddr, &nAddrLen);
+			if (INVALID_SOCKET == _cSock)
+			{
+				printf("错误,接收到了无效客户端SOCKET...\n");
+			}
+			//有新客户端加入就群发给其他所有客户端
+			for (int n = (int)g_clients.size() - 1; n >= 0; n--)
+			{
+				NewUserJoin userJoin;
+				send(g_clients[n], (const char *)&userJoin, sizeof(NewUserJoin),0);
+			}
+			g_clients.push_back(_cSock);
+			printf("新的客户端加入:IP= %s", inet_ntoa(clientAddr.sin_addr));
+		}
+		//循环处理进程
+		for (size_t n = 0; n < fdRead.fd_count; ++n)
 		{
-			Login login = {};
-			recv(_cSock, (char*)&login+sizeof(DataHeader), sizeof(Login)-sizeof(DataHeader), 0);
-			cout << "收到了命令 " << login.cmd << "数据长度" << login.dataLength << endl;
-			cout << "账号是" << login.userName << "密码是" << login.passWord<<endl;
-			//忽略判断用户密码是否正确的过程
-			//.......
-			LoginResult ret;
-			send(_cSock, (char*)&ret, sizeof(LoginResult), 0);
+			if(-1==processor(fdRead.fd_array[n]))
+			{
+				auto iter = find(g_clients.begin(), g_clients.end(),fdRead.fd_array[n]);
+				if(iter!=g_clients.end())
+				{
+					g_clients.erase(iter);
+				}
+			}
 		}
-		break;
-		case CMD_LOGINOUT:
-		{
-			LoginOut loginOut = {};
-			recv(_cSock, (char*)&loginOut + sizeof(DataHeader), sizeof(LoginOut)-sizeof(DataHeader), 0);
-			cout << "收到了命令 " << loginOut.cmd << "数据长度" << loginOut.dataLength << endl;
-			cout << "账号是" << loginOut.userName <<endl;
-			//忽略判断用户密码是否正确的过程
-			//.......
-			LoginOutResult ret;
-			send(_cSock, (char*)&ret, sizeof(LoginOutResult), 0);
-		}
-		break;
-		default://默认是错误的数据
-		{
-			header.cmd = CMD_ERROR;
-			header.dataLength = 0;
-			send(_cSock, (char*)&header, sizeof(header), 0);
-		}
-		break;
-		}
+		//cout << "空闲时间处理其他业务" << endl;
+	}
+
+	//把socket们关闭掉
+	for (int n = (int)g_clients.size() - 1; n >= 0; n--)
+	{
+		closesocket(g_clients[n]);
 	}
 	//6.关闭套接字
 	closesocket(_sock);
